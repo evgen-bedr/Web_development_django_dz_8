@@ -7,8 +7,15 @@ STATUS_CHOICES = [
     ('blocked', 'Blocked'),
     ('done', 'Done'),
 ]
-
-
+# from first_app.models.task_manager import Task
+# create_zwei_users = [
+#     Task(title='Juan', status='in_progress', deadline='2024-01-01'),
+#     Task(title='María', status='in_progress', deadline='2024-01-01'),
+#     Task(title='Juan2', status='in_progress', deadline='2024-01-01'),
+#     Task(title='María2', status='in_progress', deadline='2024-01-01')
+# ]
+#
+# Task.objects.bulk_create(create_zwei_users)
 class Task(models.Model):
     title = models.CharField(max_length=100)
     description = models.TextField(null=True, blank=True)

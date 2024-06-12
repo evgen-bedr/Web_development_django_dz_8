@@ -21,10 +21,10 @@ deadline_date = datetime.now().date() + timedelta(days=3)
 deadline_str = deadline_date.strftime('%Y-%m-%d')
 
 new_task = Task.objects.create(
-    title="Prepare presentation",
-    description="Prepare materials and slides for the presentation",
-    status="New",
-    deadline=deadline_str
+    title="End 2",
+    description="Prepare",
+    status="done",
+    deadline="2025-12-11"
 )
 
 """
