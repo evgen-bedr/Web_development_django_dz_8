@@ -5,7 +5,7 @@ from rest_framework import status
 from rest_framework.decorators import api_view
 from django.utils import timezone
 from first_app.models.task_manager import Task
-from first_app.serializers.tasks import AllTaskSerializer
+from first_app.serializers.task_serializer import AllTaskSerializer, TaskDetailSerializer, TaskCreateSerializer
 from django.core.paginator import Paginator, EmptyPage, PageNotAnInteger
 
 
@@ -18,6 +18,24 @@ class TaskPagination(Paginator):
         except PageNotAnInteger:
             page_obj = self.page(1)
         return page_obj
+
+
+@api_view(['GET'])
+def get_all_tasks(request: Request) -> Response:
+    all_tasks = Task.objects.all()
+    if not all_tasks.exists():
+        return Response(data=[], status=status.HTTP_404_NOT_FOUND)
+    serializer = TaskDetailSerializer(all_tasks, many=True)
+    return Response(data=serializer.data, status=status.HTTP_200_OK)
+
+
+@api_view(['POST'])
+def create_task(request: Request) -> Response:
+    serializer = TaskCreateSerializer(data=request.data)
+    if serializer.is_valid():
+        serializer.save()
+        return Response(serializer.data, status=status.HTTP_201_CREATED)
+    return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
 
 @api_view(['GET'])
