@@ -3,6 +3,12 @@ from first_app.models.task_manager import Category
 from first_app.controllers.category_controller import CategoryController
 
 
+class CategorySerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Category
+        fields = '__all__'
+
+
 class CategoryCreateSerializer(serializers.ModelSerializer):
     class Meta:
         model = Category

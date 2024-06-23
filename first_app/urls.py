@@ -1,4 +1,5 @@
-from django.urls import path
+from django.urls import path, include
+from rest_framework.routers import DefaultRouter
 from first_app.views.task_views import (
     get_tasks_by_status_and_deadline,
     get_tasks_statistic,
@@ -15,7 +16,14 @@ from first_app.views.sub_task_views import (
 
 from first_app.views.task_generic_view import TaskListView, TaskDetailView
 from first_app.views.sub_task_generic_view import SubTaskListView, SubTaskDetailView
-from first_app.views.category_views import CategoryCreateView, CategoryUpdateView
+from first_app.views.category_views import (
+    CategoryCreateView,
+    CategoryUpdateView,
+    CategoryViewSet
+)
+
+router = DefaultRouter()
+router.register(r'categories', CategoryViewSet)
 
 urlpatterns = [
     path('tasks/', get_tasks_by_status_and_deadline),
@@ -33,4 +41,5 @@ urlpatterns = [
     path('tasks/create/v4/<int:pk>/', TaskDetailView.as_view(), name='task-generic-detail'),
     path('subtasks/create/v4/', SubTaskListView.as_view(), name='subtask-generic-detail'),
     path('subtasks/create/v4/<int:pk>/', SubTaskDetailView.as_view(), name='subtask-generic-detail'),
+    path('', include(router.urls)),
 ]
