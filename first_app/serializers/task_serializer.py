@@ -10,6 +10,13 @@ class AllTaskSerializer(serializers.ModelSerializer):
         fields = ['title', 'description', 'status']
 
 
+class TaskSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Task
+        fields = ['title', 'description', 'status', 'owner']
+        read_only_fields = ['owner']
+
+
 class TaskDetailSerializer(serializers.ModelSerializer):
     subtasks = SubTaskSerializer(many=True, read_only=True)
 
@@ -21,7 +28,7 @@ class TaskDetailSerializer(serializers.ModelSerializer):
 class TaskCreateSerializer(serializers.ModelSerializer):
     class Meta:
         model = Task
-        fields = ['title', 'description', 'deadline']
+        fields = ['title', 'description', 'categories', 'deadline', 'owner']
 
     def validate_deadline(self, value):
         if value < timezone.now():

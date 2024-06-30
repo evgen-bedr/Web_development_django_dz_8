@@ -1,8 +1,28 @@
 from rest_framework.views import APIView
 from rest_framework.response import Response
-from rest_framework import status
+from rest_framework import status, viewsets
+from rest_framework.permissions import IsAuthenticated
+from rest_framework.generics import RetrieveUpdateDestroyAPIView
 from first_app.models.task_manager import SubTask
 from first_app.serializers.sub_task_serializer import SubTaskSerializer
+from first_app.permissions.task_permissions import IsOwnerOrReadOnly
+
+
+class SubTaskListCreateWithPermissionView(viewsets.ModelViewSet):
+    serializer_class = SubTaskSerializer
+    permission_classes = [IsAuthenticated]
+
+    def perform_create(self, serializer):
+        serializer.save(owner=self.request.user)
+
+    def get_queryset(self):
+        return SubTask.objects.filter(owner=self.request.user)
+
+
+class SubTaskDetailDeleteUpdateView(RetrieveUpdateDestroyAPIView):
+    queryset = SubTask.objects.all()
+    serializer_class = SubTaskSerializer
+    permission_classes = [IsOwnerOrReadOnly]
 
 
 class SubTaskListCreateView(APIView):

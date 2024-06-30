@@ -1,14 +1,22 @@
 from rest_framework.generics import ListCreateAPIView, RetrieveUpdateDestroyAPIView
+from rest_framework.permissions import IsAuthenticated
 from rest_framework.request import Request
 from rest_framework.response import Response
 from django.db.models import Count
-from rest_framework import status
+from rest_framework import status, viewsets
 from rest_framework.decorators import api_view
 from rest_framework.views import APIView
 from django.utils import timezone
 
 from first_app.models.task_manager import Task
-from first_app.serializers.task_serializer import AllTaskSerializer, TaskDetailSerializer, TaskCreateSerializer
+from first_app.serializers.task_serializer import (
+    AllTaskSerializer,
+    TaskDetailSerializer,
+    TaskCreateSerializer,
+    TaskSerializer
+)
+from first_app.permissions.task_permissions import IsOwnerOrReadOnly
+
 from django.core.paginator import Paginator, EmptyPage, PageNotAnInteger
 
 
@@ -21,6 +29,23 @@ class TaskPagination(Paginator):
         except PageNotAnInteger:
             page_obj = self.page(1)
         return page_obj
+
+
+class TaskListCreateView(viewsets.ModelViewSet):
+    serializer_class = TaskSerializer
+    permission_classes = [IsAuthenticated]
+
+    def perform_create(self, serializer):
+        serializer.save(owner=self.request.user)
+
+    def get_queryset(self):
+        return Task.objects.filter(owner=self.request.user)
+
+
+class TaskDetailDeleteUpdateView(RetrieveUpdateDestroyAPIView):
+    queryset = Task.objects.all()
+    serializer_class = TaskSerializer
+    permission_classes = [IsOwnerOrReadOnly]
 
 
 class GenreDetailUpdateDeleteView(RetrieveUpdateDestroyAPIView):

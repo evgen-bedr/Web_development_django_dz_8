@@ -1,4 +1,5 @@
 from django.db import models
+from django.contrib.auth.models import User
 
 STATUS_CHOICES = [
     ('new', 'New'),
@@ -16,6 +17,7 @@ class Task(models.Model):
     status = models.CharField(max_length=20, choices=STATUS_CHOICES, default='new')
     deadline = models.DateTimeField(null=True, blank=True)
     created_at = models.DateTimeField(auto_now_add=True)
+    owner = models.ForeignKey(User, on_delete=models.CASCADE, related_name='tasks')
 
     def formatted_created_at(self):
         return self.created_at.strftime('%Y-%m-%d %H:%M:%S')
@@ -46,6 +48,7 @@ class SubTask(models.Model):
     status = models.CharField(max_length=20, choices=STATUS_CHOICES, default='new')
     deadline = models.DateTimeField(null=True, blank=True)
     created_at = models.DateTimeField(auto_now_add=True)
+    owner = models.ForeignKey(User, on_delete=models.CASCADE, related_name='subtasks')
 
     def formatted_created_at(self):
         return self.created_at.strftime('%Y-%m-%d %H:%M:%S')

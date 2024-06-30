@@ -12,11 +12,13 @@ from first_app.views.task_views import (
     create_task,
     TaskCreateView,
     TaskListView,
-    GenreDetailUpdateDeleteView
+    GenreDetailUpdateDeleteView,
+    TaskListCreateView,
+    TaskDetailDeleteUpdateView
 )
 from first_app.views.sub_task_views import (
-    SubTaskListCreateView,
-    SubTaskDetailUpdateDeleteView
+    SubTaskListCreateWithPermissionView,
+    SubTaskDetailDeleteUpdateView
 )
 
 from first_app.views.auth_views import (
@@ -38,9 +40,31 @@ from first_app.views.category_views import (
 )
 
 router = DefaultRouter()
-router.register(r'categories', CategoryViewSet)
+task_router = DefaultRouter()
+subtask_router = DefaultRouter()
+
+router.register(r'', CategoryViewSet)
+task_router.register(r'', TaskListCreateView, basename='tasks')
+subtask_router.register(r'', SubTaskListCreateWithPermissionView, basename='subtasks')
 
 urlpatterns = [
+    path('categories/', include(router.urls)),
+    path('tasks/', include(task_router.urls)),
+    path('subtasks/', include(subtask_router.urls)),
+
+    path('tasks/<int:pk>/', TaskDetailDeleteUpdateView.as_view(), name='task-detail'),
+    path('tasks/create/', create_task, name='task-create'),
+    path('tasks/statistic/', get_tasks_statistic),
+    path('tasks/all/', get_all_tasks),
+    path('tasks/create/v2/', TaskCreateView.as_view(), name='task-class-create'),
+    path('tasks/create/v3/', TaskListView.as_view(), name='task-list-create'),
+    path('tasks/create/v4/', TaskListView.as_view(), name='task-generic-list'),
+    path('tasks/create/v4/<int:pk>/', TaskDetailView.as_view(), name='task-generic-detail'),
+
+    path('subtasks/<int:pk>/', SubTaskDetailDeleteUpdateView.as_view(), name='subtask-detail'),
+    path('subtasks/create/', SubTaskListCreateWithPermissionView.as_view({'post': 'create'}), name='subtask-create'),
+    path('subtasks/create/v4/<int:pk>/', SubTaskDetailView.as_view(), name='subtask-generic-detail'),
+
     path('protected/', AuthView.as_view(), name='protected'),
     path('register/', RegisterUserView.as_view(), name='user_register'),
     path('login/', LoginUserView.as_view(), name='login'),
@@ -48,20 +72,7 @@ urlpatterns = [
     path('jwt-auth/', TokenObtainPairView.as_view(), name='token_obtain_pair'),
     path('jwt-refresh/', TokenRefreshView.as_view(), name='token_refresh'),
 
-    path('tasks/', get_tasks_by_status_and_deadline),
-    path('tasks/all/', get_all_tasks),
-    path('tasks/create/', create_task, name='task-create'),
-    path('tasks/create/v2/', TaskCreateView.as_view(), name='task-class-create'),
-    path('tasks/create/v3/', TaskListView.as_view(), name='task-list-create'),
-    path('tasks/statistic/', get_tasks_statistic),
     path('categories/create/', CategoryCreateView.as_view(), name='category-create'),
     path('categories/update/<int:pk>/', CategoryUpdateView.as_view(), name='category-update'),
-    path('subtasks/', SubTaskListCreateView.as_view(), name='subtask-list-create'),
-    path('subtasks/<int:pk>/', SubTaskDetailUpdateDeleteView.as_view(), name='subtask-detail-update-delete'),
-    path('genres/<str:genre_name>/', GenreDetailUpdateDeleteView.as_view(),name='genre-detail-update-delete'),
-    path('tasks/create/v4/', TaskListView.as_view(), name='task-generic-list'),
-    path('tasks/create/v4/<int:pk>/', TaskDetailView.as_view(), name='task-generic-detail'),
-    path('subtasks/create/v4/', SubTaskListView.as_view(), name='subtask-generic-detail'),
-    path('subtasks/create/v4/<int:pk>/', SubTaskDetailView.as_view(), name='subtask-generic-detail'),
-    path('', include(router.urls)),
+    path('genres/<str:genre_name>/', GenreDetailUpdateDeleteView.as_view(), name='genre-detail-update-delete'),
 ]
